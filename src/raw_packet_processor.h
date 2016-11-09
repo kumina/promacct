@@ -8,6 +8,7 @@
 
 #include <cstddef>
 
+// Interface for handling raw network packets.
 class RawPacketProcessor {
  public:
   // TODO(ed): Should use std::basic_string_view<unsigned char>.
