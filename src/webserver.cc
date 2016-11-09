@@ -4,6 +4,7 @@
 // See the LICENSE file for details.
 
 #include <sys/socket.h>
+#include <sys/uio.h>
 
 #include <netinet/in.h>
 
@@ -55,7 +56,11 @@ void Webserver::Dispatch() {
   // Disable signalling on socket, so we don't get SIGPIPE.
   {
     int set = 1;
+#ifdef MSG_NOSIGNAL
     setsockopt(conn, SOL_SOCKET, MSG_NOSIGNAL, (void*)&set, sizeof(int));
+#else
+    setsockopt(conn, SOL_SOCKET, SO_NOSIGPIPE, (void*)&set, sizeof(int));
+#endif
   }
 
   // Enable lingering to allow the client to download everything.
