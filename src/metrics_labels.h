@@ -35,7 +35,7 @@ class MetricsLabels {
   void Print(std::ostream* output) const {
     const MetricsLabels* label = this;
     for (;;) {
-      *output << key_ << "=\"" << value_ << '"';
+      *output << label->key_ << "=\"" << label->value_ << '"';
       if (label->inherit_ == nullptr)
         break;
       label = label->inherit_;
