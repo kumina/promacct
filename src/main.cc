@@ -3,7 +3,9 @@
 // This file is distributed under a 2-clause BSD license.
 // See the LICENSE file for details.
 
+#include <chrono>
 #include <ostream>
+#include <thread>
 
 #include "ipv4_ranges.h"
 #include "packet_parser.h"
@@ -23,7 +25,6 @@ class HelloWorld : public WebserverRequestHandler {
 }
 
 int main() {
-#if 0
   Pcap p;
   p.Activate("enp3s0", PacketParser::BytesNeededIPv4, 16 * 1024 * 1024);
 
@@ -32,14 +33,22 @@ int main() {
   ParsedPacketCounter pc(&ir);
   PacketParser pa(&pc);
 
-  for (;;)
-    p.Dispatch(&pa);
-#endif
-
   HelloWorld h;
-  Webserver w(&h);
-  w.BindAndListen(7227);
+  Webserver webserver(&h);
+  webserver.BindAndListen(7227);
+
+  // Spawn a small number of worker threads for HTTP GET requests.
+  std::vector<std::thread> webserver_workers;
+  for (int i = 0; i < 5; ++i) {
+    webserver_workers.push_back(std::thread([&webserver]() {
+      for (;;)
+        webserver.Dispatch();
+    }));
+  }
+
+  // Count incoming network packets in the main thread.
   for (;;) {
-    w.Dispatch();
+    p.Dispatch(&pa);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }

@@ -16,9 +16,11 @@ void Pcap::Activate(const std::string& device, std::size_t snapshot_length,
                     std::size_t buffer_length) {
   assert(pcap_ == nullptr && "Cannot activate twice.");
 
-  char errbuf[PCAP_ERRBUF_SIZE];
-  pcap_ = pcap_create(device.c_str(), errbuf);
-  assert(pcap_ != nullptr && "Failed to create device.");
+  {
+    char errbuf[PCAP_ERRBUF_SIZE];
+    pcap_ = pcap_create(device.c_str(), errbuf);
+    assert(pcap_ != nullptr && "Failed to create device.");
+  }
 
   pcap_set_promisc(pcap_, false);
   pcap_set_snaplen(pcap_, snapshot_length);
@@ -26,6 +28,12 @@ void Pcap::Activate(const std::string& device, std::size_t snapshot_length,
 
   if (pcap_activate(pcap_) != 0)
     assert(false && "Failed to activate");
+
+  {
+    char errbuf[PCAP_ERRBUF_SIZE];
+    int ret = pcap_setnonblock(pcap_, true, errbuf);
+    assert(ret == 0 && "Failed to enable non-blocking mode.");
+  }
 }
 
 Pcap::~Pcap() {
