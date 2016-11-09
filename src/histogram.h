@@ -15,7 +15,7 @@ class Histogram {
   Histogram() : count_(), sum_(), buckets_() {
   }
 
-  void Record(uint64_t value) {
+  void Record(std::uint64_t value) {
     ++count_;
     sum_ += value;
   }
@@ -24,9 +24,9 @@ class Histogram {
   static constexpr std::array<unsigned int, sizeof...(Buckets)>
       bucket_boundaries_{Buckets...};
 
-  uint64_t count_;
-  uint64_t sum_;
-  std::array<uint64_t, sizeof...(Buckets)> buckets_;
+  std::uint64_t count_;
+  std::uint64_t sum_;
+  std::array<std::uint64_t, sizeof...(Buckets)> buckets_;
 };
 
 #endif

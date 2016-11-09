@@ -24,7 +24,7 @@ class PacketParser : public RawPacketProcessor {
   static constexpr std::size_t BytesNeededIPv4 = 34;
 
  private:
-  ParsedPacketProcessor* processor_;
+  ParsedPacketProcessor* const processor_;
 };
 
 #endif

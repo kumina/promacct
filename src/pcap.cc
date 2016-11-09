@@ -39,7 +39,7 @@ void Pcap::Callback_(unsigned char* user, const struct pcap_pkthdr* header,
   processor->ProcessPacket(bytes, header->caplen, header->len);
 }
 
-int Pcap::Dispatch(RawPacketProcessor* processor) {
+void Pcap::Dispatch(RawPacketProcessor* processor) {
   assert(pcap_ != nullptr && "Cannot dispatch before activating.");
-  return pcap_dispatch(pcap_, 0, &Pcap::Callback_, (unsigned char*)processor);
+  pcap_dispatch(pcap_, 0, &Pcap::Callback_, (unsigned char*)processor);
 }

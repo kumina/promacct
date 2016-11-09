@@ -5,31 +5,19 @@
 
 #include <iostream>
 
+#include "ipv4_ranges.h"
 #include "packet_parser.h"
+#include "parsed_packet_counter.h"
 #include "parsed_packet_processor.h"
 #include "pcap.h"
-
-namespace {
-class PacketPrinter : public ParsedPacketProcessor {
- public:
-  void ProcessIPv4Packet(std::uint32_t src, std::uint32_t dst,
-                         std::size_t original_length) {
-    std::cout << "Got IPv4 packet! " << std::hex << src << " " << dst << " "
-              << std::dec << original_length << std::endl;
-  }
-
-  void ProcessUnknownPacket(std::size_t original_length) {
-    std::cout << "Got unknown packet! " << original_length << std::endl;
-  }
-};
-}
 
 int main() {
   Pcap p;
   p.Activate("enp3s0", PacketParser::BytesNeededIPv4, 16 * 1024 * 1024);
   for (;;) {
-    PacketPrinter pr;
-    PacketParser pa(&pr);
+    IPv4Ranges ir;
+    ParsedPacketCounter pc(&ir);
+    PacketParser pa(&pc);
     p.Dispatch(&pa);
   }
 }

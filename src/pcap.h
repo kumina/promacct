@@ -22,7 +22,7 @@ class Pcap {
 
   void Activate(const std::string& device, std::size_t snapshot_length,
                 std::size_t buffer_length);
-  int Dispatch(RawPacketProcessor* processor);
+  void Dispatch(RawPacketProcessor* processor);
 
  private:
   pcap_t* pcap_;
