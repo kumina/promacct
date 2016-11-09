@@ -3,49 +3,98 @@
 // This file is distributed under a 2-clause BSD license.
 // See the LICENSE file for details.
 
+#include <unistd.h>
+
 #include <chrono>
+#include <cstdlib>
+#include <iostream>
 #include <ostream>
+#include <string>
 #include <thread>
 
 #include "ipv4_ranges.h"
 #include "metrics_page.h"
+#include "packet_counter.h"
 #include "packet_parser.h"
-#include "parsed_packet_counter.h"
-#include "parsed_packet_processor.h"
 #include "pcap.h"
 #include "webserver.h"
 #include "webserver_request_handler.h"
 
 namespace {
-class HelloWorld : public WebserverRequestHandler {
+class PacketCounterServer : public WebserverRequestHandler {
  public:
-  HelloWorld(ParsedPacketCounter* counter) : counter_(counter) {
+  PacketCounterServer(const std::vector<std::string>* interfaces,
+                      std::vector<PacketCounter>* packet_counters)
+      : interfaces_(interfaces), packet_counters_(packet_counters) {
   }
 
   void HandleRequest(std::ostream* output) override {
-    MetricsPage p("promacct_", output);
-    MetricsLabels l(nullptr, "interface", "bond0.500");
-    counter_->PrintMetrics(&l, &p);
+    MetricsPage page("promacct_", output);
+    for (size_t i = 0; i < interfaces_->size(); ++i) {
+      MetricsLabels interface(nullptr, "interface", (*interfaces_)[i]);
+      (*packet_counters_)[i].PrintMetrics(&interface, &page);
+    }
   }
 
  private:
-  ParsedPacketCounter* const counter_;
+  const std::vector<std::string>* const interfaces_;
+  std::vector<PacketCounter>* const packet_counters_;
 };
+
+void usage() {
+  std::cerr
+      << "usage: promacct -i interface ... [-p httpport] [-r ipv4range ...]"
+      << std::endl;
+  std::exit(1);
+}
 }
 
-int main() {
-  Pcap p;
-  p.Activate("bond0.500", PacketParser::BytesNeededIPv4, 16 * 1024 * 1024);
+int main(int argc, char* argv[]) {
+  // Parse command line arguments.
+  int ch;
+  std::vector<std::string> interfaces;
+  uint16_t httpport = 7227;
+  IPv4Ranges ranges;
+  while ((ch = getopt(argc, argv, "i:p:r:")) != -1) {
+    switch (ch) {
+      case 'i':
+        interfaces.push_back(optarg);
+        break;
+      case 'p':
+        httpport = std::stoi(optarg);
+        break;
+      case 'r':
+        // TODO(ed): Parse IP ranges.
+        break;
+      default:
+        usage();
+    }
+  }
+  argc -= optind;
+  argv += optind;
+  if (argc != 0 || interfaces.empty())
+    usage();
 
-  IPv4Ranges ir;
-  ir.AddRange(0xc1438a00, 0xc1438aff);
-  ir.AddRange(0xd4994600, 0xd49946ff);
-  ParsedPacketCounter pc(&ir);
-  PacketParser pa(&pc);
+  // TODO(ed): Remove this once we can parse IP ranges.
+  ranges.AddRange(0xc1438a00, 0xc1438aff);
+  ranges.AddRange(0xd4994600, 0xd49946ff);
 
-  HelloWorld h(&pc);
-  Webserver webserver(&h);
-  webserver.BindAndListen(7227);
+  // Create pcap handles and allocate histograms.
+  std::vector<Pcap> pcaps;
+  std::vector<PacketCounter> packet_counters;
+  for (const std::string& interface : interfaces) {
+    // TODO(ed): Use C++17 emplace_back().
+    // Pcap& pcap = pcaps.emplace_back();
+    pcaps.emplace_back();
+    Pcap& pcap = pcaps.back();
+    pcap.Activate(interface, PacketParser::BytesNeededIPv4, 1 << 24);
+    packet_counters.emplace_back(&ranges);
+  }
+
+  // Create HTTP server that returns metrics for all interfaces.
+  PacketCounterServer packet_counter_server(&interfaces, &packet_counters);
+  Webserver webserver(&packet_counter_server);
+  webserver.BindAndListen(httpport);
 
   // Spawn a small number of worker threads for HTTP GET requests.
   std::vector<std::thread> webserver_workers;
@@ -58,7 +107,10 @@ int main() {
 
   // Count incoming network packets in the main thread.
   for (;;) {
-    p.Dispatch(&pa);
+    for (std::size_t i = 0; i < pcaps.size(); ++i) {
+      PacketParser parser(&packet_counters[i]);
+      pcaps[i].Dispatch(&parser);
+    }
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }
