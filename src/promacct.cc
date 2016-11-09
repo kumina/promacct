@@ -38,7 +38,7 @@ int main() {
   p.Activate("enp3s0", PacketParser::BytesNeededIPv4, 16 * 1024 * 1024);
 
   IPv4Ranges ir;
-  ir.AddRange(0x0a000000, 0x0affffff);
+  ir.AddRange(0x0a000000, 0x0a0000ff);
   ParsedPacketCounter pc(&ir);
   PacketParser pa(&pc);
 

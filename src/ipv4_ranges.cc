@@ -3,6 +3,7 @@
 // This file is distributed under a 2-clause BSD license.
 // See the LICENSE file for details.
 
+#include <cassert>
 #include <cstdint>
 #include <experimental/optional>
 
@@ -19,7 +20,7 @@ std::size_t IPv4Ranges::GetLength() const {
   return length;
 }
 
-std::experimental::optional<std::size_t> IPv4Ranges::GetIndex(
+std::experimental::optional<std::size_t> IPv4Ranges::GetIndexByAddress(
     std::uint32_t address) const {
   std::size_t offset = 0;
   for (const auto& range : ranges_) {
@@ -28,4 +29,13 @@ std::experimental::optional<std::size_t> IPv4Ranges::GetIndex(
     offset += range.second - range.first + 1;
   }
   return {};
+}
+
+std::uint32_t IPv4Ranges::GetAddressByIndex(std::size_t idx) const {
+  for (const auto& range : ranges_) {
+    if (idx <= range.second - range.first)
+      return range.first + idx;
+    idx -= range.second - range.first + 1;
+  }
+  assert(0 && "GetAddressByIndex() out of bounds");
 }

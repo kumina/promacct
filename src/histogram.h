@@ -31,19 +31,21 @@ class Histogram {
   }
 
   void PrintMetrics(const std::string& name, const MetricsLabel* labels,
-                    MetricsPage* output) {
-    // Print scalar values.
-    output->PrintMetric(name + "_count", labels, count_);
-    output->PrintMetric(name + "_sum", labels, sum_);
+                    MetricsPage* output) const {
+    if (count_ > 0) {
+      // Print scalar values.
+      output->PrintMetric(name + "_count", labels, count_);
+      output->PrintMetric(name + "_sum", labels, sum_);
 
-    // Print bucket counters.
-    const unsigned int boundaries[] = {Buckets...};
-    for (unsigned int i = 0; i < sizeof...(Buckets); ++i) {
-      MetricsLabel le(labels, "le", std::to_string(boundaries[i]));
-      output->PrintMetric(name + "_bucket", &le, buckets_[i]);
+      // Print bucket counters.
+      const unsigned int boundaries[] = {Buckets...};
+      for (unsigned int i = 0; i < sizeof...(Buckets); ++i) {
+        MetricsLabel le(labels, "le", std::to_string(boundaries[i]));
+        output->PrintMetric(name + "_bucket", &le, buckets_[i]);
+      }
+      MetricsLabel le(labels, "le", "+Inf");
+      output->PrintMetric(name + "_bucket", &le, count_);
     }
-    MetricsLabel le(labels, "le", "+Inf");
-    output->PrintMetric(name + "_bucket", &le, count_);
   }
 
  private:

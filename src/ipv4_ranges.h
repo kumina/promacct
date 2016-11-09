@@ -14,8 +14,9 @@ class IPv4Ranges {
  public:
   void AddRange(uint32_t first, uint32_t last);
   std::size_t GetLength() const;
-  std::experimental::optional<std::size_t> GetIndex(
+  std::experimental::optional<std::size_t> GetIndexByAddress(
       std::uint32_t address) const;
+  std::uint32_t GetAddressByIndex(std::size_t) const;
 
  private:
   std::vector<std::pair<uint32_t, uint32_t>> ranges_;
