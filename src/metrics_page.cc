@@ -4,21 +4,15 @@
 // See the LICENSE file for details.
 
 #include "metrics_page.h"
-#include "metrics_label.h"
+#include "metrics_labels.h"
 
 void MetricsPage::PrintMetric(const std::string& name,
-                              const MetricsLabel* labels, uint64_t value) {
+                              const MetricsLabels* labels, uint64_t value) {
   // Print metric name, including its labels.
   *output_ << prefix_ << name;
   if (labels != nullptr) {
     *output_ << '{';
-    for (;;) {
-      labels->Print(output_);
-      labels = labels->GetNext();
-      if (labels == nullptr)
-        break;
-      *output_ << ',';
-    }
+    labels->Print(output_);
     *output_ << '}';
   }
 

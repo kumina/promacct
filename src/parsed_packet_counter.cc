@@ -45,7 +45,7 @@ void ParsedPacketCounter::ProcessUnknownPacket(std::size_t original_length) {
   packet_size_bytes_all_.Record(original_length);
 }
 
-void ParsedPacketCounter::PrintMetrics(const MetricsLabel* labels,
+void ParsedPacketCounter::PrintMetrics(const MetricsLabels* labels,
                                        MetricsPage* output) {
   packet_size_bytes_all_.PrintMetrics("packet_size_bytes_all", labels, output);
 
@@ -55,7 +55,7 @@ void ParsedPacketCounter::PrintMetrics(const MetricsLabel* labels,
     std::stringstream addr_str;
     addr_str << (addr_num >> 24) << '.' << (addr_num >> 16 & 0xff) << '.'
              << (addr_num >> 8 & 0xff) << '.' << (addr_num & 0xff);
-    MetricsLabel ip(labels, "ip", addr_str.str());
+    MetricsLabels ip(labels, "ip", addr_str.str());
 
     // Print aggregated TX/RX statistics.
     packet_size_bytes_ipv4_tx_[i].PrintMetrics("packet_size_bytes_ipv4_tx", &ip,

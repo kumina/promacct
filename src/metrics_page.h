@@ -9,7 +9,7 @@
 #include <ostream>
 #include <string>
 
-class MetricsLabel;
+class MetricsLabels;
 
 class MetricsPage {
  public:
@@ -17,7 +17,7 @@ class MetricsPage {
       : prefix_(prefix), output_(output) {
   }
 
-  void PrintMetric(const std::string& name, const MetricsLabel* labels,
+  void PrintMetric(const std::string& name, const MetricsLabels* labels,
                    uint64_t value);
 
  private:

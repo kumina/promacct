@@ -24,7 +24,7 @@ class HelloWorld : public WebserverRequestHandler {
 
   void HandleRequest(std::ostream* output) override {
     MetricsPage p("promacct_", output);
-    MetricsLabel l(nullptr, "interface", "bond0.500");
+    MetricsLabels l(nullptr, "interface", "bond0.500");
     counter_->PrintMetrics(&l, &p);
   }
 

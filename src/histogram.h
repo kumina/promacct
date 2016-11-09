@@ -9,7 +9,7 @@
 #include <array>
 #include <cstdint>
 
-#include "metrics_label.h"
+#include "metrics_labels.h"
 #include "metrics_page.h"
 
 // Prometheus-style histogram.
@@ -42,7 +42,7 @@ class Histogram {
   }
 
   // Prints all values stored in the histogram object.
-  void PrintMetrics(const std::string& name, const MetricsLabel* labels,
+  void PrintMetrics(const std::string& name, const MetricsLabels* labels,
                     MetricsPage* output) const {
     if (count_ > 0) {
       // Print scalar values.
@@ -52,10 +52,10 @@ class Histogram {
       // Print bucket counters.
       const unsigned int boundaries[] = {Buckets...};
       for (unsigned int i = 0; i < sizeof...(Buckets); ++i) {
-        MetricsLabel le(labels, "le", std::to_string(boundaries[i]));
+        MetricsLabels le(labels, "le", std::to_string(boundaries[i]));
         output->PrintMetric(name + "_bucket", &le, buckets_[i]);
       }
-      MetricsLabel le(labels, "le", "+Inf");
+      MetricsLabels le(labels, "le", "+Inf");
       output->PrintMetric(name + "_bucket", &le, count_);
     }
   }

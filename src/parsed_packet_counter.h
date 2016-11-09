@@ -13,7 +13,7 @@
 #include "parsed_packet_processor.h"
 
 class IPv4Ranges;
-class MetricsLabel;
+class MetricsLabels;
 class MetricsPage;
 
 class ParsedPacketCounter : public ParsedPacketProcessor {
@@ -24,7 +24,7 @@ class ParsedPacketCounter : public ParsedPacketProcessor {
                          std::size_t original_length) override;
   void ProcessUnknownPacket(std::size_t original_length) override;
 
-  void PrintMetrics(const MetricsLabel* labels, MetricsPage* output);
+  void PrintMetrics(const MetricsLabels* labels, MetricsPage* output);
 
  private:
   typedef Histogram<64, 128, 256, 512, 1024, 2048> PacketSizeHistogram;
