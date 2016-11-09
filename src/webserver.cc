@@ -10,7 +10,10 @@
 #include <unistd.h>
 
 #include <cassert>
+#include <chrono>
+#include <iostream>
 #include <sstream>
+#include <thread>
 
 #include "webserver.h"
 #include "webserver_request_handler.h"
@@ -55,6 +58,14 @@ void Webserver::Dispatch() {
     setsockopt(conn, SOL_SOCKET, MSG_NOSIGNAL, (void*)&set, sizeof(int));
   }
 
+  // Enable lingering to allow the client to download everything.
+  {
+    struct linger linger = {};
+    linger.l_onoff = 1;
+    linger.l_linger = 10;
+    setsockopt(conn, SOL_SOCKET, SO_LINGER, (void*)&linger, sizeof(linger));
+  }
+
   // Compute response body.
   std::ostringstream body;
   handler_->HandleRequest(&body);
@@ -62,11 +73,11 @@ void Webserver::Dispatch() {
 
   // Compute response headers.
   std::ostringstream headers;
-  headers << "HTTP/1.1 200 OK\n"
-          << "Connection: close\n"
-          << "Content-Length: " << body_str.size() << "\n"
-          << "Content-Type: text/plain\n"
-          << "\n";
+  headers << "HTTP/1.1 200 OK\r\n"
+          << "Connection: close\r\n"
+          << "Content-Length: " << body_str.size() << "\r\n"
+          << "Content-Type: text/plain\r\n"
+          << "\r\n";
   std::string headers_str = headers.str();
 
   // Send response headers and body over the socket.
@@ -75,6 +86,11 @@ void Webserver::Dispatch() {
   iov[0].iov_len = headers_str.size();
   iov[1].iov_base = (void*)body_str.data();
   iov[1].iov_len = body_str.size();
-  writev(conn, iov, 2);
+  ssize_t len = writev(conn, iov, 2);
+  ssize_t expected = headers_str.size() + body_str.size();
+  // TODO(ed): Solve this! Use shutdown()!
+  if (len != expected)
+    std::cout << "SHORT WRITE " << len << " VS " << expected << std::endl;
+  std::this_thread::sleep_for(std::chrono::seconds(2));
   close(conn);
 }
