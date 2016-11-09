@@ -8,6 +8,7 @@
 #include <thread>
 
 #include "ipv4_ranges.h"
+#include "metrics_page.h"
 #include "packet_parser.h"
 #include "parsed_packet_counter.h"
 #include "parsed_packet_processor.h"
@@ -19,7 +20,8 @@ namespace {
 class HelloWorld : public WebserverRequestHandler {
  public:
   void HandleRequest(std::ostream* output) override {
-    *output << "Hello world\n";
+    MetricsPage p(output);
+    p.PrintMetric("Hello", {{"a", "b"}, {"c", "d"}}, 12345);
   }
 };
 }
