@@ -19,10 +19,17 @@
 namespace {
 class HelloWorld : public WebserverRequestHandler {
  public:
-  void HandleRequest(std::ostream* output) override {
-    MetricsPage p(output);
-    p.PrintMetric("Hello", {{"a", "b"}, {"c", "d"}}, 12345);
+  HelloWorld(ParsedPacketCounter* counter) : counter_(counter) {
   }
+
+  void HandleRequest(std::ostream* output) override {
+    MetricsPage p("promacct_", output);
+    MetricsLabel l(nullptr, "interface", "enp3s0");
+    counter_->PrintMetrics(&l, &p);
+  }
+
+ private:
+  ParsedPacketCounter* const counter_;
 };
 }
 
@@ -35,7 +42,7 @@ int main() {
   ParsedPacketCounter pc(&ir);
   PacketParser pa(&pc);
 
-  HelloWorld h;
+  HelloWorld h(&pc);
   Webserver webserver(&h);
   webserver.BindAndListen(7227);
 

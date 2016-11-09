@@ -4,21 +4,24 @@
 // See the LICENSE file for details.
 
 #include "metrics_page.h"
+#include "metrics_label.h"
 
 void MetricsPage::PrintMetric(const std::string& name,
-                              const std::map<std::string, std::string>& labels,
-                              uint64_t value) {
+                              const MetricsLabel* labels, uint64_t value) {
   // Print metric name, including its labels.
-  *ostream_ << name;
-  if (!labels.empty()) {
-    char separator = '{';
-    for (const auto& label : labels) {
-      *ostream_ << separator << label.first << "=\"" << label.second << '"';
-      separator = ',';
+  *output_ << prefix_ << name;
+  if (labels != nullptr) {
+    *output_ << '{';
+    for (;;) {
+      labels->Print(output_);
+      labels = labels->GetNext();
+      if (labels == nullptr)
+        break;
+      *output_ << ',';
     }
-    *ostream_ << '}';
+    *output_ << '}';
   }
 
   // Print metric value.
-  *ostream_ << ' ' << value << std::endl;
+  *output_ << ' ' << value << std::endl;
 }

@@ -13,6 +13,8 @@
 #include "parsed_packet_processor.h"
 
 class IPv4Ranges;
+class MetricsLabel;
+class MetricsPage;
 
 class ParsedPacketCounter : public ParsedPacketProcessor {
  public:
@@ -22,14 +24,16 @@ class ParsedPacketCounter : public ParsedPacketProcessor {
                          std::size_t original_length) override;
   void ProcessUnknownPacket(std::size_t original_length) override;
 
+  void PrintMetrics(const MetricsLabel* labels, MetricsPage* output);
+
  private:
   typedef Histogram<64, 128, 256, 512, 1024, 2048> PacketSizeHistogram;
 
   const IPv4Ranges* const aggregation_ipv4_;
 
-  PacketSizeHistogram packet_sizes_all_;
-  std::vector<PacketSizeHistogram> packet_sizes_ipv4_tx_;
-  std::vector<PacketSizeHistogram> packet_sizes_ipv4_rx_;
+  PacketSizeHistogram packet_size_bytes_all_;
+  std::vector<PacketSizeHistogram> packet_size_bytes_ipv4_tx_;
+  std::vector<PacketSizeHistogram> packet_size_bytes_ipv4_rx_;
 };
 
 #endif

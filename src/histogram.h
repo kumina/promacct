@@ -9,6 +9,9 @@
 #include <array>
 #include <cstdint>
 
+#include "metrics_label.h"
+#include "metrics_page.h"
+
 template <unsigned int... Buckets>
 class Histogram {
  public:
@@ -16,14 +19,34 @@ class Histogram {
   }
 
   void Record(std::uint64_t value) {
+    // Update scalar values.
     ++count_;
     sum_ += value;
+
+    // Adjust bucket counters.
+    const unsigned int boundaries[] = {Buckets...};
+    for (unsigned int i = sizeof...(Buckets);
+         i > 0 && value <= boundaries[i - 1]; --i)
+      ++buckets_[i - 1];
+  }
+
+  void PrintMetrics(const std::string& name, const MetricsLabel* labels,
+                    MetricsPage* output) {
+    // Print scalar values.
+    output->PrintMetric(name + "_count", labels, count_);
+    output->PrintMetric(name + "_sum", labels, sum_);
+
+    // Print bucket counters.
+    const unsigned int boundaries[] = {Buckets...};
+    for (unsigned int i = 0; i < sizeof...(Buckets); ++i) {
+      MetricsLabel le(labels, "le", std::to_string(boundaries[i]));
+      output->PrintMetric(name + "_bucket", &le, buckets_[i]);
+    }
+    MetricsLabel le(labels, "le", "+Inf");
+    output->PrintMetric(name + "_bucket", &le, count_);
   }
 
  private:
-  static constexpr std::array<unsigned int, sizeof...(Buckets)>
-      bucket_boundaries_{Buckets...};
-
   std::uint64_t count_;
   std::uint64_t sum_;
   std::array<std::uint64_t, sizeof...(Buckets)> buckets_;

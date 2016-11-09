@@ -6,21 +6,23 @@
 #ifndef METRICS_PAGE_H
 #define METRICS_PAGE_H
 
-#include <map>
 #include <ostream>
 #include <string>
 
+class MetricsLabel;
+
 class MetricsPage {
  public:
-  MetricsPage(std::ostream* ostream) : ostream_(ostream) {
+  MetricsPage(const std::string& prefix, std::ostream* output)
+      : prefix_(prefix), output_(output) {
   }
 
-  void PrintMetric(const std::string& name,
-                   const std::map<std::string, std::string>& labels,
+  void PrintMetric(const std::string& name, const MetricsLabel* labels,
                    uint64_t value);
 
  private:
-  std::ostream* const ostream_;
+  const std::string prefix_;
+  std::ostream* const output_;
 };
 
 #endif
