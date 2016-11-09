@@ -3,8 +3,8 @@
 // This file is distributed under a 2-clause BSD license.
 // See the LICENSE file for details.
 
-#ifndef PARSED_PACKET_COUNTER_H
-#define PARSED_PACKET_COUNTER_H
+#ifndef PACKET_COUNTER_H
+#define PACKET_COUNTER_H
 
 #include <cstdint>
 #include <vector>
@@ -18,9 +18,9 @@ class MetricsPage;
 
 // Counts network packets, aggregating them by IPv4 source/destination
 // address.
-class ParsedPacketCounter : public ParsedPacketProcessor {
+class PacketCounter : public ParsedPacketProcessor {
  public:
-  explicit ParsedPacketCounter(const IPv4Ranges* aggregation_ipv4);
+  explicit PacketCounter(const IPv4Ranges* aggregation_ipv4);
 
   // Counts an IPv4 packet.
   void ProcessIPv4Packet(std::uint32_t src, std::uint32_t dst,

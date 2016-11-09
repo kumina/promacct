@@ -8,9 +8,9 @@
 #include <sstream>
 
 #include "ipv4_ranges.h"
-#include "parsed_packet_counter.h"
+#include "packet_counter.h"
 
-ParsedPacketCounter::ParsedPacketCounter(const IPv4Ranges* aggregation_ipv4)
+PacketCounter::PacketCounter(const IPv4Ranges* aggregation_ipv4)
     : aggregation_ipv4_(aggregation_ipv4) {
   // Prealllocate histograms for IPv4 address aggregation, so that
   // ProcessIPv4Packet() doesn't need to do any allocating.
@@ -19,9 +19,8 @@ ParsedPacketCounter::ParsedPacketCounter(const IPv4Ranges* aggregation_ipv4)
   packet_size_bytes_ipv4_rx_.resize(ipv4_slots);
 }
 
-void ParsedPacketCounter::ProcessIPv4Packet(std::uint32_t src,
-                                            std::uint32_t dst,
-                                            std::size_t original_length) {
+void PacketCounter::ProcessIPv4Packet(std::uint32_t src, std::uint32_t dst,
+                                      std::size_t original_length) {
   packet_size_bytes_all_.Record(original_length);
 
   // Aggregation on source IPv4 address.
@@ -41,12 +40,12 @@ void ParsedPacketCounter::ProcessIPv4Packet(std::uint32_t src,
   }
 }
 
-void ParsedPacketCounter::ProcessUnknownPacket(std::size_t original_length) {
+void PacketCounter::ProcessUnknownPacket(std::size_t original_length) {
   packet_size_bytes_all_.Record(original_length);
 }
 
-void ParsedPacketCounter::PrintMetrics(const MetricsLabels* labels,
-                                       MetricsPage* output) {
+void PacketCounter::PrintMetrics(const MetricsLabels* labels,
+                                 MetricsPage* output) {
   packet_size_bytes_all_.PrintMetrics("packet_size_bytes_all", labels, output);
 
   for (std::size_t i = 0; i < aggregation_ipv4_->GetLength(); ++i) {
