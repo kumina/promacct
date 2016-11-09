@@ -14,10 +14,12 @@
 int main() {
   Pcap p;
   p.Activate("enp3s0", PacketParser::BytesNeededIPv4, 16 * 1024 * 1024);
-  for (;;) {
-    IPv4Ranges ir;
-    ParsedPacketCounter pc(&ir);
-    PacketParser pa(&pc);
+
+  IPv4Ranges ir;
+  ir.AddRange(0x0a000000, 0x0affffff);
+  ParsedPacketCounter pc(&ir);
+  PacketParser pa(&pc);
+
+  for (;;)
     p.Dispatch(&pa);
-  }
 }

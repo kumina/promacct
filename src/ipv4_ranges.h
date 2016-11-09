@@ -8,7 +8,7 @@
 
 #include <cstdint>
 #include <experimental/optional>
-#include <forward_list>
+#include <vector>
 
 class IPv4Ranges {
  public:
@@ -18,7 +18,7 @@ class IPv4Ranges {
       std::uint32_t address) const;
 
  private:
-  std::forward_list<std::pair<uint32_t, uint32_t>> ranges_;
+  std::vector<std::pair<uint32_t, uint32_t>> ranges_;
 };
 
 #endif

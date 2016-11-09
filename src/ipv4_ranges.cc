@@ -9,6 +9,7 @@
 #include "ipv4_ranges.h"
 
 void IPv4Ranges::AddRange(uint32_t first, uint32_t last) {
+  ranges_.push_back({first, last});
 }
 
 std::size_t IPv4Ranges::GetLength() const {

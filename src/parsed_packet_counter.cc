@@ -27,20 +27,22 @@ void ParsedPacketCounter::ProcessIPv4Packet(std::uint32_t src,
     std::experimental::optional<std::size_t> index =
         aggregation_ipv4_->GetIndex(src);
     if (index) {
-      std::cout << "TX match " << src << std::endl;
+      std::cout << "TX match " << std::hex << src << " " << std::dec << *index
+                << std::endl;
       packet_sizes_ipv4_tx_[*index].Record(original_length);
     } else {
-      std::cout << "TX mismatch " << src << std::endl;
+      std::cout << "TX mismatch " << std::hex << src << std::endl;
     }
   }
   {
     std::experimental::optional<std::size_t> index =
         aggregation_ipv4_->GetIndex(dst);
     if (index) {
-      std::cout << "RX match " << dst << std::endl;
+      std::cout << "RX match " << std::hex << dst << " " << std::dec << *index
+                << std::endl;
       packet_sizes_ipv4_rx_[*index].Record(original_length);
     } else {
-      std::cout << "RX mismatch " << dst << std::endl;
+      std::cout << "RX mismatch " << std::hex << dst << std::endl;
     }
   }
 }
