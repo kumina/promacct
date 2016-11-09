@@ -24,7 +24,7 @@ class HelloWorld : public WebserverRequestHandler {
 
   void HandleRequest(std::ostream* output) override {
     MetricsPage p("promacct_", output);
-    MetricsLabel l(nullptr, "interface", "enp3s0");
+    MetricsLabel l(nullptr, "interface", "bond0.500");
     counter_->PrintMetrics(&l, &p);
   }
 
@@ -35,10 +35,11 @@ class HelloWorld : public WebserverRequestHandler {
 
 int main() {
   Pcap p;
-  p.Activate("enp3s0", PacketParser::BytesNeededIPv4, 16 * 1024 * 1024);
+  p.Activate("bond0.500", PacketParser::BytesNeededIPv4, 16 * 1024 * 1024);
 
   IPv4Ranges ir;
-  ir.AddRange(0x0a000000, 0x0a0000ff);
+  ir.AddRange(0xc1438a00, 0xc1438aff);
+  ir.AddRange(0xd4994600, 0xd49946ff);
   ParsedPacketCounter pc(&ir);
   PacketParser pa(&pc);
 
