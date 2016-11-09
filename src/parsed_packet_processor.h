@@ -8,10 +8,14 @@
 
 #include <cstdint>
 
+// Interface for processing parsed network packets.
 class ParsedPacketProcessor {
  public:
+  // IPv4 packet detected.
   virtual void ProcessIPv4Packet(std::uint32_t src, std::uint32_t dst,
                                  std::size_t original_length) = 0;
+
+  // Network packet of a different format detected.
   virtual void ProcessUnknownPacket(std::size_t original_length) = 0;
 };
 

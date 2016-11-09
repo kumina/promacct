@@ -12,15 +12,24 @@
 
 class ParsedPacketProcessor;
 
+// Adapter for parsing Ethernet packets.
+//
+// The Pcap class invokes ProcessPacket(), providing it access to the
+// raw packet data. This class attempts to extract the IPv4 source and
+// destination addresses and invokes the methods of the
+// ParsedPacketProcessor.
 class PacketParser : public RawPacketProcessor {
  public:
   explicit PacketParser(ParsedPacketProcessor* processor)
       : processor_(processor) {
   }
 
+  // Parses raw packets.
   void ProcessPacket(const unsigned char* bytes, std::size_t bytes_length,
                      std::size_t original_length) override;
 
+  // Minimum snapshot length needed in order to properly parse IPv4
+  // packet headers.
   static constexpr std::size_t BytesNeededIPv4 = 34;
 
  private:

@@ -11,12 +11,18 @@
 
 class MetricsLabels;
 
+// Adapter for rendering pages containing metrics.
+//
+// Instead of letting all of the code print metrics straight to an
+// ostream, this class acts like an adapter. Callers can simply call
+// PrintMetric(), providing it a name, a set of labels and a value.
 class MetricsPage {
  public:
   MetricsPage(const std::string& prefix, std::ostream* output)
       : prefix_(prefix), output_(output) {
   }
 
+  // Writes a metric to the output in the form '$prefix$name{$labels} $value'.
   void PrintMetric(const std::string& name, const MetricsLabels* labels,
                    uint64_t value);
 
