@@ -12,12 +12,23 @@
 #include "metrics_label.h"
 #include "metrics_page.h"
 
+// Prometheus-style histogram.
+//
+// Prometheus has a standard convention for processing histograms. This
+// templated class provides a convenient way of creating such objects.
+// The template arguments can be used to specify the bucket cutoffs.
+//
+// A histogram containing four buckets ("32", "64", "128" and "+Inf")
+// can be created as follows:
+//
+//     Histogram<32, 64, 128> my_histogram;
 template <unsigned int... Buckets>
 class Histogram {
  public:
   Histogram() : count_(), sum_(), buckets_() {
   }
 
+  // Stores a new sample value in the histogram object.
   void Record(std::uint64_t value) {
     // Update scalar values.
     ++count_;
@@ -30,6 +41,7 @@ class Histogram {
       ++buckets_[i - 1];
   }
 
+  // Prints all values stored in the histogram object.
   void PrintMetrics(const std::string& name, const MetricsLabel* labels,
                     MetricsPage* output) const {
     if (count_ > 0) {
@@ -49,9 +61,9 @@ class Histogram {
   }
 
  private:
-  std::uint64_t count_;
-  std::uint64_t sum_;
-  std::array<std::uint64_t, sizeof...(Buckets)> buckets_;
+  std::uint64_t count_;  // Number of samples.
+  std::uint64_t sum_;    // Sum of all samples.
+  std::array<std::uint64_t, sizeof...(Buckets)> buckets_;  // Histogram buckets.
 };
 
 #endif
