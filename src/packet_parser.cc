@@ -15,6 +15,7 @@ void PacketParser::ProcessPacket(const unsigned char* bytes,
   // Strip off the ethernet header and don't account for it in the
   // histograms. We're not interested in accounting the link layer.
   assert(bytes_length >= BytesNeededEthernetHeader);
+  assert(original_length >= bytes_length);
   bytes += BytesNeededEthernetHeader;
   bytes_length -= BytesNeededEthernetHeader;
   original_length -= BytesNeededEthernetHeader;
