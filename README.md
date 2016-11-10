@@ -32,3 +32,22 @@ This makes promacct sniff for traffic on eth0 and eth1, storing the
 total amount of traffic in separate histograms. It also creates
 histograms for the aggregated amount of network traffic for every
 individual IPv4 address between 192.168.1.100 and 192.168.1.200.
+
+# Useful Prometheus rules
+
+The following rule can be used to compute a five-minute rate of all
+traffic per host and network interface:
+
+```
+instance_interface:promacct_packet_size_bytes_all:rate5m =
+    sum(rate(promacct_packet_size_bytes_all_sum{job="promacct"}[5m]))
+    by (instance, interface)
+```
+
+This metric can be used to compute a monthly 95th percentile as follows:
+
+```
+instance_interface:promacct_packet_size_bytes_all:quantile31d{quantile="0.95"} =
+    quantile_over_time(0.95, instance_interface:promacct_packet_size_bytes_all:rate5m[31d])
+
+```
