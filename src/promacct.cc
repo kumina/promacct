@@ -3,6 +3,8 @@
 // This file is distributed under a 2-clause BSD license.
 // See the LICENSE file for details.
 
+#include <arpa/inet.h>
+
 #include <unistd.h>
 
 #include <chrono>
@@ -42,10 +44,17 @@ class PacketCounterServer : public WebserverRequestHandler {
 };
 
 void usage() {
-  std::cerr
-      << "usage: promacct -i interface ... [-p httpport] [-r ipv4range ...]"
-      << std::endl;
+  std::cerr << "usage: promacct -i interface ... [-p httpport] "
+               "[-r startaddr-endaddr] ...]"
+            << std::endl;
   std::exit(1);
+}
+
+uint32_t parse_ipv4_address(const std::string& str) {
+  struct in_addr addr;
+  if (inet_pton(AF_INET, str.c_str(), &addr) != 1)
+    usage();
+  return ntohl(addr.s_addr);
 }
 }
 
@@ -63,9 +72,15 @@ int main(int argc, char* argv[]) {
       case 'p':
         httpport = std::stoi(optarg);
         break;
-      case 'r':
-        // TODO(ed): Parse IP ranges.
+      case 'r': {
+        std::string arg = optarg;
+        std::size_t split = arg.find('-');
+        if (split == std::string::npos)
+          usage();
+        ranges.AddRange(parse_ipv4_address(std::string(arg, 0, split)),
+                        parse_ipv4_address(std::string(arg, split + 1)));
         break;
+      }
       default:
         usage();
     }
@@ -74,10 +89,6 @@ int main(int argc, char* argv[]) {
   argv += optind;
   if (argc != 0 || interfaces.empty())
     usage();
-
-  // TODO(ed): Remove this once we can parse IP ranges.
-  ranges.AddRange(0xc1438a00, 0xc1438aff);
-  ranges.AddRange(0xd4994600, 0xd49946ff);
 
   // Create pcap handles and allocate histograms.
   std::vector<Pcap> pcaps;
