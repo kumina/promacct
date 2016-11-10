@@ -50,7 +50,7 @@ void Webserver::BindAndListen(uint16_t port) {
 void Webserver::Dispatch() {
   // Accept new incoming connection.
   assert(fd_ >= 0 && "Cannot dispatch on unbound socket.");
-  int conn = accept(fd_, NULL, NULL);
+  int conn = accept(fd_, nullptr, nullptr);
   assert(conn >= 0 && "Failed to accept incoming connection.");
 
   // Disable signalling on socket, so we don't get SIGPIPE.
