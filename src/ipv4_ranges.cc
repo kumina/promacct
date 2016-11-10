@@ -10,6 +10,7 @@
 #include "ipv4_ranges.h"
 
 void IPv4Ranges::AddRange(uint32_t first, uint32_t last) {
+  assert(first <= last && "Not a valid IPv4 range.");
   ranges_.push_back({first, last});
 }
 
