@@ -28,9 +28,13 @@ class PacketParser : public RawPacketProcessor {
   void ProcessPacket(const unsigned char* bytes, std::size_t bytes_length,
                      std::size_t original_length) override;
 
+  // Minimum snapshot length needed in order to properly parse the
+  // ethernet header containing the MAC addresses.
+  static constexpr std::size_t BytesNeededEthernetHeader = 14;
+
   // Minimum snapshot length needed in order to properly parse IPv4
   // packet headers.
-  static constexpr std::size_t BytesNeededIPv4 = 34;
+  static constexpr std::size_t BytesNeededIPv4 = BytesNeededEthernetHeader + 20;
 
  private:
   ParsedPacketProcessor* const processor_;
