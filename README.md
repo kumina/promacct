@@ -49,5 +49,4 @@ This metric can be used to compute a monthly 95th percentile as follows:
 ```
 instance_interface:promacct_packet_size_bytes_all:quantile31d{quantile="0.95"} =
     quantile_over_time(0.95, instance_interface:promacct_packet_size_bytes_all:rate5m[31d])
-
 ```
