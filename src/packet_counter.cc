@@ -11,12 +11,11 @@
 #include "packet_counter.h"
 
 PacketCounter::PacketCounter(const IPv4Ranges* aggregation_ipv4)
-    : aggregation_ipv4_(aggregation_ipv4) {
-  // Prealllocate histograms for IPv4 address aggregation, so that
-  // ProcessIPv4Packet() doesn't need to do any allocating.
-  std::size_t ipv4_slots = aggregation_ipv4_->GetLength();
-  packet_size_bytes_ipv4_tx_.resize(ipv4_slots);
-  packet_size_bytes_ipv4_rx_.resize(ipv4_slots);
+    : aggregation_ipv4_(aggregation_ipv4),
+      packet_size_bytes_ipv4_tx_(aggregation_ipv4_->GetLength()),
+      packet_size_bytes_ipv4_rx_(aggregation_ipv4_->GetLength()) {
+  // Histograms for IPv4 address aggregation are already preallocated,
+  // so that ProcessIPv4Packet() doesn't need to do any resizing.
 }
 
 void PacketCounter::ProcessIPv4Packet(std::uint32_t src, std::uint32_t dst,
