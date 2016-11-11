@@ -28,6 +28,12 @@ void Webserver::BindAndListen(uint16_t port) {
   fd_ = socket(AF_INET, SOCK_STREAM, 0);
   assert(fd_ >= 0 && "Failed to create socket.");
 
+  // Allow binding if there are still connections in TIME_WAIT.
+  {
+    int set = 1;
+    setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR, (void*)&set, sizeof(int));
+  }
+
   // Bind socket.
   {
     struct sockaddr_in sin = {};
