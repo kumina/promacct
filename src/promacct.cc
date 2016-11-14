@@ -116,7 +116,10 @@ int main(int argc, char* argv[]) {
     }));
   }
 
-  // Count incoming network packets in the main thread.
+  // Count incoming network packets in the main thread at a fixed 10 Hz
+  // rate. This has the advantage of reducing CPU load significantly, as
+  // libpcap tends to already unblock when a very small number of
+  // packets are available for processing.
   for (;;) {
     for (std::size_t i = 0; i < pcaps.size(); ++i) {
       PacketParser parser(&packet_counters[i]);
