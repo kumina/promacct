@@ -50,7 +50,7 @@ void usage() {
   std::exit(1);
 }
 
-uint32_t parse_ipv4_address(const std::string& str) {
+std::uint32_t parse_ipv4_address(const std::string& str) {
   struct in_addr addr;
   if (inet_pton(AF_INET, str.c_str(), &addr) != 1)
     usage();
@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
   // Parse command line arguments.
   int ch;
   std::vector<std::string> interfaces;
-  uint16_t httpport = 7227;
+  std::uint16_t httpport = 7227;
   IPv4Ranges ranges;
   while ((ch = getopt(argc, argv, "i:p:r:")) != -1) {
     switch (ch) {
