@@ -10,7 +10,7 @@ support for aggregating by source/destination IPv4 address.
 Where this utility differs from pmacct is that it doesn't store its
 results in a database. Instead, it binds a HTTP server that exports a
 metrics page that can be scraped by Prometheus. By default, this HTTP
-server listens on port 7227.
+server listens on port 9112.
 
 # Building promacct
 

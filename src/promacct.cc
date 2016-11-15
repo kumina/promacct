@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
   // Parse command line arguments.
   int ch;
   std::vector<std::string> interfaces;
-  std::uint16_t httpport = 7227;
+  std::uint16_t httpport = 9112;
   IPv4Ranges ranges;
   while ((ch = getopt(argc, argv, "i:p:r:")) != -1) {
     switch (ch) {
