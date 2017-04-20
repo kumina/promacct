@@ -5,22 +5,22 @@
 
 #include <cassert>
 #include <cstdint>
+#include <experimental/string_view>
 
 #include "packet_parser.h"
 #include "parsed_packet_processor.h"
 
-void PacketParser::ProcessPacket(const unsigned char* bytes,
-                                 std::size_t bytes_length,
-                                 std::size_t original_length) {
+void PacketParser::ProcessPacket(
+    std::experimental::basic_string_view<unsigned char> bytes,
+    std::size_t original_length) {
   // Strip off the ethernet header and don't account for it in the
   // histograms. We're not interested in accounting the link layer.
-  assert(bytes_length >= BytesNeededEthernetHeader);
-  assert(original_length >= bytes_length);
-  bytes += BytesNeededEthernetHeader;
-  bytes_length -= BytesNeededEthernetHeader;
+  assert(bytes.size() >= BytesNeededEthernetHeader);
+  assert(original_length >= bytes.size());
+  bytes.remove_prefix(BytesNeededEthernetHeader);
   original_length -= BytesNeededEthernetHeader;
 
-  if (bytes_length >= 20 && (bytes[0] & 0xf0) == 0x40) {
+  if (bytes.size() >= 20 && (bytes[0] & 0xf0) == 0x40) {
     // Proper IPv4 packet. Extract source and destination addresses.
     std::uint32_t src = (std::uint32_t)bytes[12] << 24 |
                         (std::uint32_t)bytes[13] << 16 |

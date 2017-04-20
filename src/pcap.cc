@@ -44,7 +44,7 @@ Pcap::~Pcap() {
 void Pcap::Callback_(unsigned char* user, const struct pcap_pkthdr* header,
                      const unsigned char* bytes) {
   RawPacketProcessor* processor = (RawPacketProcessor*)user;
-  processor->ProcessPacket(bytes, header->caplen, header->len);
+  processor->ProcessPacket({bytes, header->caplen}, header->len);
 }
 
 unsigned int Pcap::Dispatch(RawPacketProcessor* processor) {

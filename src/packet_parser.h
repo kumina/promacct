@@ -7,6 +7,7 @@
 #define PACKET_PARSER_H
 
 #include <cstddef>
+#include <experimental/string_view>
 
 #include "raw_packet_processor.h"
 
@@ -25,7 +26,7 @@ class PacketParser : public RawPacketProcessor {
   }
 
   // Parses raw packets.
-  void ProcessPacket(const unsigned char* bytes, std::size_t bytes_length,
+  void ProcessPacket(std::experimental::basic_string_view<unsigned char> bytes,
                      std::size_t original_length) override;
 
   // Minimum snapshot length needed in order to properly parse the

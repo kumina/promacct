@@ -7,14 +7,14 @@
 #define RAW_PACKET_PROCESSOR_H
 
 #include <cstddef>
+#include <experimental/string_view>
 
 // Interface for handling raw network packets.
 class RawPacketProcessor {
  public:
-  // TODO(ed): Should use std::basic_string_view<unsigned char>.
-  virtual void ProcessPacket(const unsigned char* bytes,
-                             std::size_t bytes_length,
-                             std::size_t original_length) = 0;
+  virtual void ProcessPacket(
+      std::experimental::basic_string_view<unsigned char> bytes,
+      std::size_t original_length) = 0;
 };
 
 #endif
