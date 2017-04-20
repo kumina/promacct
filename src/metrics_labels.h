@@ -6,6 +6,7 @@
 #ifndef METRICS_LABELS_H
 #define METRICS_LABELS_H
 
+#include <experimental/string_view>
 #include <ostream>
 #include <string>
 
@@ -26,8 +27,9 @@
 // emitted onto the metrics page.
 class MetricsLabels {
  public:
-  MetricsLabels(const MetricsLabels* inherit, const std::string& key,
-                const std::string& value)
+  MetricsLabels(const MetricsLabels* inherit,
+                std::experimental::string_view key,
+                std::experimental::string_view value)
       : inherit_(inherit), key_(key), value_(value) {
   }
 

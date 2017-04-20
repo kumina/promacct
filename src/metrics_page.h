@@ -6,6 +6,7 @@
 #ifndef METRICS_PAGE_H
 #define METRICS_PAGE_H
 
+#include <experimental/string_view>
 #include <ostream>
 #include <string>
 
@@ -18,13 +19,13 @@ class MetricsLabels;
 // PrintMetric(), providing it a name, a set of labels and a value.
 class MetricsPage {
  public:
-  MetricsPage(const std::string& prefix, std::ostream* output)
+  MetricsPage(std::experimental::string_view prefix, std::ostream* output)
       : prefix_(prefix), output_(output) {
   }
 
   // Writes a metric to the output in the form '$prefix$name{$labels} $value'.
-  void PrintMetric(const std::string& name, const MetricsLabels* labels,
-                   uint64_t value);
+  void PrintMetric(std::experimental::string_view name,
+                   const MetricsLabels* labels, uint64_t value);
 
  private:
   const std::string prefix_;
