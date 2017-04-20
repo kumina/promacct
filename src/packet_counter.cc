@@ -5,7 +5,9 @@
 
 #include <cstdint>
 #include <experimental/optional>
+#include <experimental/string_view>
 #include <sstream>
+#include <string>
 
 #include "ipv4_ranges.h"
 #include "packet_counter.h"
@@ -49,16 +51,19 @@ void PacketCounter::PrintMetrics(const MetricsLabels* labels,
 
   for (std::size_t i = 0; i < aggregation_ipv4_->GetLength(); ++i) {
     // Compute IP address string representation.
-    std::uint32_t addr_num = aggregation_ipv4_->GetAddressByIndex(i);
-    std::stringstream addr_str;
-    addr_str << (addr_num >> 24) << '.' << (addr_num >> 16 & 0xff) << '.'
-             << (addr_num >> 8 & 0xff) << '.' << (addr_num & 0xff);
-    MetricsLabels ip(labels, "ip", addr_str.str());
+    std::pair<std::experimental::string_view, std::uint32_t> addr =
+        aggregation_ipv4_->GetAddressByIndex(i);
+    std::stringstream addr_ss;
+    addr_ss << (addr.second >> 24) << '.' << (addr.second >> 16 & 0xff) << '.'
+            << (addr.second >> 8 & 0xff) << '.' << (addr.second & 0xff);
+    std::string addr_str = addr_ss.str();
+    MetricsLabels ip(labels, "ip", addr_str);
+    MetricsLabels ip_range(&ip, "ip_range", addr.first);
 
     // Print aggregated TX/RX statistics.
-    packet_size_bytes_ipv4_tx_[i].PrintMetrics("packet_size_bytes_ipv4_tx", &ip,
-                                               output);
-    packet_size_bytes_ipv4_rx_[i].PrintMetrics("packet_size_bytes_ipv4_rx", &ip,
-                                               output);
+    packet_size_bytes_ipv4_tx_[i].PrintMetrics("packet_size_bytes_ipv4_tx",
+                                               &ip_range, output);
+    packet_size_bytes_ipv4_rx_[i].PrintMetrics("packet_size_bytes_ipv4_rx",
+                                               &ip_range, output);
   }
 }

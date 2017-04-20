@@ -27,7 +27,7 @@ certain C++14 features. It makes use of libpcap.
 After building promacct, it can be started as follows:
 
 ```
-promacct -i eth0 -i eth1 -r 192.168.1.100-192.168.1.200
+promacct -i eth0 -i eth1 -r my_office_network:192.168.1.100-192.168.1.200
 ```
 
 This makes promacct sniff for traffic on eth0 and eth1, storing the

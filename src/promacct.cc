@@ -7,6 +7,7 @@
 
 #include <unistd.h>
 
+#include <algorithm>
 #include <chrono>
 #include <cstdlib>
 #include <iostream>
@@ -45,7 +46,7 @@ class PacketCounterServer : public WebserverRequestHandler {
 
 void usage() {
   std::cerr << "usage: promacct -i interface ... [-p httpport] "
-               "[-r startaddr-endaddr] ...]"
+               "[-r description:startaddr-endaddr ...]"
             << std::endl;
   std::exit(1);
 }
@@ -67,18 +68,26 @@ int main(int argc, char* argv[]) {
   while ((ch = getopt(argc, argv, "i:p:r:")) != -1) {
     switch (ch) {
       case 'i':
+        // Network interface.
         interfaces.push_back(optarg);
         break;
       case 'p':
+        // Port number on which to bind the HTTP server.
         httpport = std::stoi(optarg);
         break;
       case 'r': {
-        std::string arg = optarg;
-        std::size_t split = arg.find('-');
-        if (split == std::string::npos)
+        // IP range: description:startaddr-endaddr.
+        std::experimental::string_view arg(optarg);
+        auto split1 = std::find(arg.begin(), arg.end(), ':');
+        if (split1 == arg.end())
           usage();
-        ranges.AddRange(parse_ipv4_address(std::string(arg, 0, split)),
-                        parse_ipv4_address(std::string(arg, split + 1)));
+        auto split2 = std::find(split1, arg.end(), '-');
+        if (split2 == arg.end())
+          usage();
+        ranges.AddRange(
+            std::experimental::string_view(arg.begin(), split1 - arg.begin()),
+            parse_ipv4_address(std::string(split1 + 1, split2)),
+            parse_ipv4_address(std::string(split2 + 1, arg.end())));
         break;
       }
       default:
