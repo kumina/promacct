@@ -53,7 +53,8 @@ class Histogram {
       // Print bucket counters.
       const unsigned int boundaries[] = {Buckets...};
       for (unsigned int i = 0; i < sizeof...(Buckets); ++i) {
-        MetricsLabels le(labels, "le", std::to_string(boundaries[i]));
+        std::string boundary = std::to_string(boundaries[i]);
+        MetricsLabels le(labels, "le", boundary);
         output->PrintMetric(name + "_bucket", &le, buckets_[i]);
       }
       MetricsLabels le(labels, "le", "+Inf");
