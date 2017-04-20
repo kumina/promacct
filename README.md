@@ -15,10 +15,12 @@ server listens on port 9112.
 # Building promacct
 
 Right now promacct is still simple enough that it can easily be built by
-hand. Be sure to take a look at `build.sh` to see how.
+hand. Be sure to take a look at `build.sh` to see how. The script
+`build_static.sh` builds a statically linked executable for Linux-based
+systems.
 
 Promacct has very few dependencies. It's written in C++, making use of
-certain C++11 features. It makes use of libpcap.
+certain C++14 features. It makes use of libpcap.
 
 # Using promacct
 
