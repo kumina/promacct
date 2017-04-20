@@ -56,7 +56,7 @@ std::uint32_t parse_ipv4_address(const std::string& str) {
     usage();
   return ntohl(addr.s_addr);
 }
-}
+}  // namespace
 
 int main(int argc, char* argv[]) {
   // Parse command line arguments.
