@@ -8,6 +8,7 @@
 
 #include <array>
 #include <cstdint>
+#include <string>
 
 #include "metrics_labels.h"
 #include "metrics_page.h"
