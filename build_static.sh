@@ -8,6 +8,5 @@ apk update
 apk add g++ libpcap-dev
 
 cd /promacct
-#c++ -Wl,--whole-archive -lpthread -Wl,--no-whole-archive -static -std=gnu++1y -o promacct src/*.cc -Wall -Werror -lpcap
-c++ -static -std=gnu++1y -o promacct src/*.cc -Wall -Werror -lpcap
+c++ -static -std=gnu++1z -o promacct src/*.cc -Wall -Werror -lpcap
 EOF
