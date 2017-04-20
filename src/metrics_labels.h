@@ -8,7 +8,6 @@
 
 #include <experimental/string_view>
 #include <ostream>
-#include <string>
 
 // Utility class for attaching labels to metrics.
 //
@@ -24,7 +23,8 @@
 //     p->PrintMetric("name", &l2, 123);
 //
 // This will result in 'name{key1="value1",key2="value"} 123' being
-// emitted onto the metrics page.
+// emitted onto the metrics page. This class does not own the strings
+// passed to the constructor.
 class MetricsLabels {
  public:
   MetricsLabels(const MetricsLabels* inherit,
@@ -46,9 +46,9 @@ class MetricsLabels {
   }
 
  private:
-  const MetricsLabels* const inherit_;  // Next labels.
-  std::string const key_;               // Key of this label.
-  std::string const value_;             // Value of this label.
+  const MetricsLabels* const inherit_;          // Next labels.
+  std::experimental::string_view const key_;    // Key of this label.
+  std::experimental::string_view const value_;  // Value of this label.
 };
 
 #endif
