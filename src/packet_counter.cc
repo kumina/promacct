@@ -21,6 +21,7 @@ PacketCounter::PacketCounter(const IPv4Ranges* aggregation_ipv4)
 }
 
 void PacketCounter::ProcessIPv4Packet(std::uint32_t src, std::uint32_t dst,
+                                      std::uint8_t protocol,
                                       std::size_t original_length) {
   packet_size_bytes_all_.Record(original_length);
 
@@ -29,7 +30,7 @@ void PacketCounter::ProcessIPv4Packet(std::uint32_t src, std::uint32_t dst,
     std::experimental::optional<std::size_t> index =
         aggregation_ipv4_->GetIndexByAddress(src);
     if (index)
-      packet_size_bytes_ipv4_tx_[*index].Record(original_length);
+      packet_size_bytes_ipv4_tx_[*index].Record(protocol, original_length);
   }
 
   // Aggregation on destination IPv4 address.
@@ -37,7 +38,7 @@ void PacketCounter::ProcessIPv4Packet(std::uint32_t src, std::uint32_t dst,
     std::experimental::optional<std::size_t> index =
         aggregation_ipv4_->GetIndexByAddress(dst);
     if (index)
-      packet_size_bytes_ipv4_rx_[*index].Record(original_length);
+      packet_size_bytes_ipv4_rx_[*index].Record(protocol, original_length);
   }
 }
 

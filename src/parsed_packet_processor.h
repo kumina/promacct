@@ -13,6 +13,7 @@ class ParsedPacketProcessor {
  public:
   // IPv4 packet detected.
   virtual void ProcessIPv4Packet(std::uint32_t src, std::uint32_t dst,
+                                 std::uint8_t protocol,
                                  std::size_t original_length) = 0;
 
   // Network packet of a different format detected.

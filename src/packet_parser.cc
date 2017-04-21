@@ -28,7 +28,7 @@ void PacketParser::ProcessPacket(
     std::uint32_t dst = (std::uint32_t)bytes[16] << 24 |
                         (std::uint32_t)bytes[17] << 16 |
                         (std::uint32_t)bytes[18] << 8 | bytes[19];
-    processor_->ProcessIPv4Packet(src, dst, original_length);
+    processor_->ProcessIPv4Packet(src, dst, bytes[9], original_length);
   } else {
     // Unknown packet type.
     processor_->ProcessUnknownPacket(original_length);
