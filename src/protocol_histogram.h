@@ -38,6 +38,15 @@ class ProtocolHistogram {
       case 41:
         encap_.Record(std::forward<Args>(args)...);
         break;
+      case 47:
+        gre_.Record(std::forward<Args>(args)...);
+        break;
+      case 50:
+        esp_.Record(std::forward<Args>(args)...);
+        break;
+      case 88:
+        eigrp_.Record(std::forward<Args>(args)...);
+        break;
       case 89:
         ospf_.Record(std::forward<Args>(args)...);
         break;
@@ -74,6 +83,18 @@ class ProtocolHistogram {
       encap_.PrintMetrics(name, &protocol, output);
     }
     {
+      MetricsLabels protocol(labels, "protocol", "gre");
+      gre_.PrintMetrics(name, &protocol, output);
+    }
+    {
+      MetricsLabels protocol(labels, "protocol", "esp");
+      esp_.PrintMetrics(name, &protocol, output);
+    }
+    {
+      MetricsLabels protocol(labels, "protocol", "eigrp");
+      eigrp_.PrintMetrics(name, &protocol, output);
+    }
+    {
       MetricsLabels protocol(labels, "protocol", "ospf");
       ospf_.PrintMetrics(name, &protocol, output);
     }
@@ -90,6 +111,9 @@ class ProtocolHistogram {
   T tcp_;      // Stats for the Transmission Control Protocol.
   T udp_;      // Stats for the User Datagram Protocol.
   T encap_;    // Stats for the IPv6 encapsulation protocol.
+  T gre_;      // Stats for the Generic Routing Encapsulation protocol.
+  T esp_;      // Stats for the Encap Security Payload protocol.
+  T eigrp_;    // Stats for the Enhanced Interior Gateway Routing Protocol.
   T ospf_;     // Stats for the Open Shortest Path First protocol.
   T sctp_;     // Stats for the Stream Control Transmission Protocol.
   T unknown_;  // Stats for all other traffic.
