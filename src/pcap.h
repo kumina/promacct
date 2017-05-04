@@ -26,9 +26,6 @@ class PcapDeleter {
 // Network packet capturer based on libpcap.
 class Pcap {
  public:
-  Pcap() : pcap_() {
-  }
-
   // Create a pcap handle for a network device and start capturing.
   std::optional<std::string> Activate(const std::string& device,
                                       std::size_t snapshot_length,
