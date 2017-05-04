@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Kumina, https://kumina.nl/
+// Copyright (c) 2016-2017 Kumina, https://kumina.nl/
 //
 // This file is distributed under a 2-clause BSD license.
 // See the LICENSE file for details.
@@ -6,8 +6,8 @@
 #ifndef METRICS_LABELS_H
 #define METRICS_LABELS_H
 
-#include <experimental/string_view>
 #include <ostream>
+#include <string_view>
 
 // Utility class for attaching labels to metrics.
 //
@@ -27,9 +27,8 @@
 // passed to the constructor.
 class MetricsLabels {
  public:
-  MetricsLabels(const MetricsLabels* inherit,
-                std::experimental::string_view key,
-                std::experimental::string_view value)
+  MetricsLabels(const MetricsLabels* inherit, std::string_view key,
+                std::string_view value)
       : inherit_(inherit), key_(key), value_(value) {
   }
 
@@ -46,9 +45,9 @@ class MetricsLabels {
   }
 
  private:
-  const MetricsLabels* const inherit_;          // Next labels.
-  std::experimental::string_view const key_;    // Key of this label.
-  std::experimental::string_view const value_;  // Value of this label.
+  const MetricsLabels* const inherit_;  // Next labels.
+  std::string_view const key_;          // Key of this label.
+  std::string_view const value_;        // Value of this label.
 };
 
 #endif

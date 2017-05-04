@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Kumina, https://kumina.nl/
+// Copyright (c) 2016-2017 Kumina, https://kumina.nl/
 //
 // This file is distributed under a 2-clause BSD license.
 // See the LICENSE file for details.
@@ -7,7 +7,7 @@
 #define PACKET_PARSER_H
 
 #include <cstddef>
-#include <experimental/string_view>
+#include <string_view>
 
 #include "raw_packet_processor.h"
 
@@ -26,7 +26,7 @@ class PacketParser : public RawPacketProcessor {
   }
 
   // Parses raw packets.
-  void ProcessPacket(std::experimental::basic_string_view<unsigned char> bytes,
+  void ProcessPacket(std::basic_string_view<unsigned char> bytes,
                      std::size_t original_length) override;
 
   // Minimum snapshot length needed in order to properly parse the

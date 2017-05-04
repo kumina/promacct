@@ -1,13 +1,13 @@
-// Copyright (c) 2016 Kumina, https://kumina.nl/
+// Copyright (c) 2016-2017 Kumina, https://kumina.nl/
 //
 // This file is distributed under a 2-clause BSD license.
 // See the LICENSE file for details.
 
 #include <cstdint>
-#include <experimental/optional>
-#include <experimental/string_view>
+#include <optional>
 #include <sstream>
 #include <string>
+#include <string_view>
 
 #include "ipv4_ranges.h"
 #include "packet_counter.h"
@@ -27,7 +27,7 @@ void PacketCounter::ProcessIPv4Packet(std::uint32_t src, std::uint32_t dst,
 
   // Aggregation on source IPv4 address.
   {
-    std::experimental::optional<std::size_t> index =
+    std::optional<std::size_t> index =
         aggregation_ipv4_->GetIndexByAddress(src);
     if (index)
       packet_size_bytes_ipv4_tx_[*index].Record(protocol, original_length);
@@ -35,7 +35,7 @@ void PacketCounter::ProcessIPv4Packet(std::uint32_t src, std::uint32_t dst,
 
   // Aggregation on destination IPv4 address.
   {
-    std::experimental::optional<std::size_t> index =
+    std::optional<std::size_t> index =
         aggregation_ipv4_->GetIndexByAddress(dst);
     if (index)
       packet_size_bytes_ipv4_rx_[*index].Record(protocol, original_length);
@@ -52,7 +52,7 @@ void PacketCounter::PrintMetrics(const MetricsLabels* labels,
 
   for (std::size_t i = 0; i < aggregation_ipv4_->GetLength(); ++i) {
     // Compute IP address string representation.
-    std::pair<std::experimental::string_view, std::uint32_t> addr =
+    std::pair<std::string_view, std::uint32_t> addr =
         aggregation_ipv4_->GetAddressByIndex(i);
     std::stringstream addr_ss;
     addr_ss << (addr.second >> 24) << '.' << (addr.second >> 16 & 0xff) << '.'

@@ -1,18 +1,17 @@
-// Copyright (c) 2016 Kumina, https://kumina.nl/
+// Copyright (c) 2016-2017 Kumina, https://kumina.nl/
 //
 // This file is distributed under a 2-clause BSD license.
 // See the LICENSE file for details.
 
 #include <cassert>
 #include <cstdint>
-#include <experimental/string_view>
+#include <string_view>
 
 #include "packet_parser.h"
 #include "parsed_packet_processor.h"
 
-void PacketParser::ProcessPacket(
-    std::experimental::basic_string_view<unsigned char> bytes,
-    std::size_t original_length) {
+void PacketParser::ProcessPacket(std::basic_string_view<unsigned char> bytes,
+                                 std::size_t original_length) {
   // Strip off the ethernet header and don't account for it in the
   // histograms. We're not interested in accounting the link layer.
   assert(bytes.size() >= BytesNeededEthernetHeader);

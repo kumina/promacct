@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Kumina, https://kumina.nl/
+// Copyright (c) 2016-2017 Kumina, https://kumina.nl/
 //
 // This file is distributed under a 2-clause BSD license.
 // See the LICENSE file for details.
@@ -13,6 +13,7 @@
 #include <iostream>
 #include <ostream>
 #include <string>
+#include <string_view>
 #include <thread>
 
 #include "ipv4_ranges.h"
@@ -77,17 +78,16 @@ int main(int argc, char* argv[]) {
         break;
       case 'r': {
         // IP range: description:startaddr-endaddr.
-        std::experimental::string_view arg(optarg);
+        std::string_view arg(optarg);
         auto split1 = std::find(arg.begin(), arg.end(), ':');
         if (split1 == arg.end())
           usage();
         auto split2 = std::find(split1, arg.end(), '-');
         if (split2 == arg.end())
           usage();
-        ranges.AddRange(
-            std::experimental::string_view(arg.begin(), split1 - arg.begin()),
-            parse_ipv4_address(std::string(split1 + 1, split2)),
-            parse_ipv4_address(std::string(split2 + 1, arg.end())));
+        ranges.AddRange(std::string_view(arg.begin(), split1 - arg.begin()),
+                        parse_ipv4_address(std::string(split1 + 1, split2)),
+                        parse_ipv4_address(std::string(split2 + 1, arg.end())));
         break;
       }
       default:
