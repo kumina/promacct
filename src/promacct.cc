@@ -107,7 +107,13 @@ int main(int argc, char* argv[]) {
     // Pcap& pcap = pcaps.emplace_back();
     pcaps.emplace_back();
     Pcap& pcap = pcaps.back();
-    pcap.Activate(interface, PacketParser::BytesNeededIPv4, 1 << 24);
+    std::optional<std::string> error =
+        pcap.Activate(interface, PacketParser::BytesNeededIPv4, 1 << 24);
+    if (error) {
+      std::cerr << "Failed to activate pcap for interface " << interface << ": "
+                << *error << std::endl;
+      std::exit(1);
+    }
     packet_counters.emplace_back(&ranges);
   }
 
