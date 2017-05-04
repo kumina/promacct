@@ -7,9 +7,17 @@
 #define PROTOCOL_HISTOGRAM_H
 
 #include <cstdint>
+#include <iterator>
 #include <utility>
 
 #include "metrics_labels.h"
+
+namespace {
+constexpr std::pair<std::uint32_t, const char*> kIanaProtocolNumbers[] = {
+    {1, "icmp"}, {2, "igmp"}, {6, "tcp"},    {17, "udp"},  {41, "encap"},
+    {47, "gre"}, {50, "esp"}, {88, "eigrp"}, {89, "ospf"}, {132, "sctp"},
+};
+}
 
 // Multiplexer for storing a histogram per transport layer protocol.
 //
@@ -22,101 +30,29 @@ class ProtocolHistogram {
   // Stores a new sample value in one of its histogram objects.
   template <typename... Args>
   void Record(std::uint8_t protocol, Args&&... args) {
-    switch (protocol) {
-      case 1:
-        icmp_.Record(std::forward<Args>(args)...);
-        break;
-      case 2:
-        igmp_.Record(std::forward<Args>(args)...);
-        break;
-      case 6:
-        tcp_.Record(std::forward<Args>(args)...);
-        break;
-      case 17:
-        udp_.Record(std::forward<Args>(args)...);
-        break;
-      case 41:
-        encap_.Record(std::forward<Args>(args)...);
-        break;
-      case 47:
-        gre_.Record(std::forward<Args>(args)...);
-        break;
-      case 50:
-        esp_.Record(std::forward<Args>(args)...);
-        break;
-      case 88:
-        eigrp_.Record(std::forward<Args>(args)...);
-        break;
-      case 89:
-        ospf_.Record(std::forward<Args>(args)...);
-        break;
-      case 132:
-        sctp_.Record(std::forward<Args>(args)...);
-        break;
-      default:
+    for (std::size_t i = 0; i < std::size(kIanaProtocolNumbers); ++i) {
+      if (protocol == kIanaProtocolNumbers[i].first) {
         unknown_.Record(std::forward<Args>(args)...);
-        break;
+        return;
+      }
     }
+    unknown_.Record(std::forward<Args>(args)...);
   }
 
   // Prints all values stored in all of its histogram objects.
   void PrintMetrics(const std::string& name, const MetricsLabels* labels,
                     MetricsPage* output) const {
-    {
-      MetricsLabels protocol(labels, "protocol", "icmp");
-      icmp_.PrintMetrics(name, &protocol, output);
-    }
-    {
-      MetricsLabels protocol(labels, "protocol", "igmp");
-      igmp_.PrintMetrics(name, &protocol, output);
-    }
-    {
-      MetricsLabels protocol(labels, "protocol", "tcp");
-      tcp_.PrintMetrics(name, &protocol, output);
-    }
-    {
-      MetricsLabels protocol(labels, "protocol", "udp");
-      udp_.PrintMetrics(name, &protocol, output);
-    }
-    {
-      MetricsLabels protocol(labels, "protocol", "encap");
-      encap_.PrintMetrics(name, &protocol, output);
-    }
-    {
-      MetricsLabels protocol(labels, "protocol", "gre");
-      gre_.PrintMetrics(name, &protocol, output);
-    }
-    {
-      MetricsLabels protocol(labels, "protocol", "esp");
-      esp_.PrintMetrics(name, &protocol, output);
-    }
-    {
-      MetricsLabels protocol(labels, "protocol", "eigrp");
-      eigrp_.PrintMetrics(name, &protocol, output);
-    }
-    {
-      MetricsLabels protocol(labels, "protocol", "ospf");
-      ospf_.PrintMetrics(name, &protocol, output);
-    }
-    {
-      MetricsLabels protocol(labels, "protocol", "sctp");
-      sctp_.PrintMetrics(name, &protocol, output);
+    for (std::size_t i = 0; i < std::size(kIanaProtocolNumbers); ++i) {
+      MetricsLabels protocol(labels, "protocol",
+                             kIanaProtocolNumbers[i].second);
+      known_[i].PrintMetrics(name, &protocol, output);
     }
     unknown_.PrintMetrics(name, labels, output);
   }
 
  private:
-  T icmp_;     // Stats for the Internet Control Message Protocol.
-  T igmp_;     // Stats for the Internet Group Management Protocol.
-  T tcp_;      // Stats for the Transmission Control Protocol.
-  T udp_;      // Stats for the User Datagram Protocol.
-  T encap_;    // Stats for the IPv6 encapsulation protocol.
-  T gre_;      // Stats for the Generic Routing Encapsulation protocol.
-  T esp_;      // Stats for the Encap Security Payload protocol.
-  T eigrp_;    // Stats for the Enhanced Interior Gateway Routing Protocol.
-  T ospf_;     // Stats for the Open Shortest Path First protocol.
-  T sctp_;     // Stats for the Stream Control Transmission Protocol.
-  T unknown_;  // Stats for all other traffic.
+  T known_[std::size(kIanaProtocolNumbers)];  // Stats for all known protocols.
+  T unknown_;                                 // Stats for all other traffic.
 };
 
 #endif
