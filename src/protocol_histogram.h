@@ -32,7 +32,7 @@ class ProtocolHistogram {
   void Record(std::uint8_t protocol, Args&&... args) {
     for (std::size_t i = 0; i < std::size(kIanaProtocolNumbers); ++i) {
       if (protocol == kIanaProtocolNumbers[i].first) {
-        unknown_.Record(std::forward<Args>(args)...);
+        known_[i].Record(std::forward<Args>(args)...);
         return;
       }
     }
