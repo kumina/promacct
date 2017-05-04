@@ -22,7 +22,7 @@ Webserver::~Webserver() {
     close(fd_);
 }
 
-void Webserver::BindAndListen(uint16_t port) {
+void Webserver::BindAndListen(std::uint16_t port) {
   // Create socket.
   assert(fd_ == -1 && "Webserver is already listening.");
   fd_ = socket(AF_INET, SOCK_STREAM, 0);

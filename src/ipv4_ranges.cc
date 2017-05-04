@@ -11,8 +11,8 @@
 
 #include "ipv4_ranges.h"
 
-void IPv4Ranges::AddRange(std::string_view description, uint32_t first,
-                          uint32_t last) {
+void IPv4Ranges::AddRange(std::string_view description, std::uint32_t first,
+                          std::uint32_t last) {
   assert(first <= last && "Not a valid IPv4 range.");
   ranges_.push_back({std::string(description), first, last});
 }

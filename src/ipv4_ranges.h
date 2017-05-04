@@ -20,7 +20,8 @@
 class IPv4Ranges {
  public:
   // Adds a new IPv4 address range to the store.
-  void AddRange(std::string_view description, uint32_t first, uint32_t last);
+  void AddRange(std::string_view description, std::uint32_t first,
+                std::uint32_t last);
 
   // Returns the total number of IPv4 addresses stored within.
   std::size_t GetLength() const;
@@ -38,8 +39,8 @@ class IPv4Ranges {
  private:
   struct IPv4Range {
     std::string description;
-    uint32_t first;
-    uint32_t last;
+    std::uint32_t first;
+    std::uint32_t last;
   };
 
   std::vector<IPv4Range> ranges_;

@@ -9,7 +9,8 @@
 #include "metrics_page.h"
 
 void MetricsPage::PrintMetric(std::string_view name,
-                              const MetricsLabels* labels, uint64_t value) {
+                              const MetricsLabels* labels,
+                              std::uint64_t value) {
   // Print metric name, including its labels.
   *output_ << prefix_ << name;
   if (labels != nullptr) {

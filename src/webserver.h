@@ -24,7 +24,7 @@ class Webserver {
 
   // Binds the web server to a given port number and starts listening
   // for incoming requests.
-  void BindAndListen(uint16_t port);
+  void BindAndListen(std::uint16_t port);
 
   // Blocks and processes a single incoming HTTP request.
   void Dispatch();
