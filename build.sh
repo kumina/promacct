@@ -1,5 +1,5 @@
 #!/bin/sh
 
 set -e
-c++ -std=gnu++1y -o promacct src/*.cc -Wall -Werror -lpcap
+c++ -O2 -std=gnu++1z -o promacct src/*.cc -Wall -Werror -lpcap
 clang-format -i src/*

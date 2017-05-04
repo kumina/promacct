@@ -20,7 +20,7 @@ hand. Be sure to take a look at `build.sh` to see how. The script
 systems.
 
 Promacct has very few dependencies. It's written in C++, making use of
-certain C++14 features. It makes use of libpcap.
+certain C++17 features. It makes use of libpcap.
 
 # Using promacct
 
