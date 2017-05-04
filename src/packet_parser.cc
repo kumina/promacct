@@ -10,7 +10,7 @@
 #include "packet_parser.h"
 #include "parsed_packet_processor.h"
 
-void PacketParser::ProcessPacket(std::basic_string_view<unsigned char> bytes,
+void PacketParser::ProcessPacket(std::basic_string_view<std::uint8_t> bytes,
                                  std::size_t original_length) {
   // Strip off the ethernet header and don't account for it in the
   // histograms. We're not interested in accounting the link layer.

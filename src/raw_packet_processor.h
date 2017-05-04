@@ -6,13 +6,13 @@
 #ifndef RAW_PACKET_PROCESSOR_H
 #define RAW_PACKET_PROCESSOR_H
 
-#include <cstddef>
+#include <cstdint>
 #include <string_view>
 
 // Interface for handling raw network packets.
 class RawPacketProcessor {
  public:
-  virtual void ProcessPacket(std::basic_string_view<unsigned char> bytes,
+  virtual void ProcessPacket(std::basic_string_view<std::uint8_t> bytes,
                              std::size_t original_length) = 0;
 };
 
