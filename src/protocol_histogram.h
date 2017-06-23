@@ -40,12 +40,12 @@ class ProtocolHistogram {
   }
 
   // Prints all values stored in all of its histogram objects.
-  void PrintMetrics(const std::string& name, const MetricsLabels* labels,
+  void PrintMetrics(const std::string& name, const MetricsLabels& labels,
                     MetricsPage* output) const {
     for (std::size_t i = 0; i < std::size(kIanaProtocolNumbers); ++i) {
-      MetricsLabels protocol(labels, "protocol",
-                             kIanaProtocolNumbers[i].second);
-      known_[i].PrintMetrics(name, &protocol, output);
+      MetricsLabel protocol("protocol", kIanaProtocolNumbers[i].second);
+      MetricsLabelsJoiner joiner(&labels, &protocol);
+      known_[i].PrintMetrics(name, joiner, output);
     }
     unknown_.PrintMetrics(name, labels, output);
   }

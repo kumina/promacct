@@ -24,7 +24,7 @@ class MetricsPage {
   }
 
   // Writes a metric to the output in the form '$prefix$name{$labels} $value'.
-  void PrintMetric(std::string_view name, const MetricsLabels* labels,
+  void PrintMetric(std::string_view name, const MetricsLabels& labels,
                    std::uint64_t value);
 
  private:

@@ -9,16 +9,11 @@
 #include "metrics_page.h"
 
 void MetricsPage::PrintMetric(std::string_view name,
-                              const MetricsLabels* labels,
+                              const MetricsLabels& labels,
                               std::uint64_t value) {
-  // Print metric name, including its labels.
-  *output_ << prefix_ << name;
-  if (labels != nullptr) {
-    *output_ << '{';
-    labels->Print(output_);
-    *output_ << '}';
-  }
-
-  // Print metric value.
-  *output_ << ' ' << value << std::endl;
+  // Print metric name, labels and its value.
+  *output_ << prefix_ << name << '{';
+  bool needs_comma = false;
+  labels.Print(output_, &needs_comma);
+  *output_ << "} " << value << std::endl;
 }

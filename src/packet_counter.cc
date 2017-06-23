@@ -46,25 +46,29 @@ void PacketCounter::ProcessUnknownPacket(std::size_t original_length) {
   packet_size_bytes_all_.Record(original_length);
 }
 
-void PacketCounter::PrintMetrics(const MetricsLabels* labels,
+void PacketCounter::PrintMetrics(const MetricsLabels& labels,
                                  MetricsPage* output) {
   packet_size_bytes_all_.PrintMetrics("packet_size_bytes_all", labels, output);
 
   for (std::size_t i = 0; i < aggregation_ipv4_->GetLength(); ++i) {
-    // Compute IP address string representation.
-    std::pair<std::string_view, std::uint32_t> addr =
+    // Combine the labels of the packet counter and the per-address
+    // histogram.
+    std::pair<const MetricsLabels*, std::uint32_t> addr =
         aggregation_ipv4_->GetAddressByIndex(i);
+    MetricsLabelsJoiner joiner1(&labels, addr.first);
+
+    // Add the IPv4 address as a label.
     std::stringstream addr_ss;
     addr_ss << (addr.second >> 24) << '.' << (addr.second >> 16 & 0xff) << '.'
             << (addr.second >> 8 & 0xff) << '.' << (addr.second & 0xff);
     std::string addr_str = addr_ss.str();
-    MetricsLabels ip(labels, "ip", addr_str);
-    MetricsLabels ip_range(&ip, "ip_range", addr.first);
+    MetricsLabel ip("ip", addr_str);
+    MetricsLabelsJoiner joiner2(&joiner1, &labels);
 
     // Print aggregated TX/RX statistics.
     packet_size_bytes_ipv4_tx_[i].PrintMetrics("packet_size_bytes_ipv4_tx",
-                                               &ip_range, output);
+                                               joiner2, output);
     packet_size_bytes_ipv4_rx_[i].PrintMetrics("packet_size_bytes_ipv4_rx",
-                                               &ip_range, output);
+                                               joiner2, output);
   }
 }

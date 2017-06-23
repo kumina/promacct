@@ -27,13 +27,16 @@ certain C++17 features. It makes use of libpcap.
 After building promacct, it can be started as follows:
 
 ```
-promacct -i eth0 -i eth1 -r my_office_network:192.168.1.100-192.168.1.200
+promacct -i eth0 -i eth1 -r 192.168.1.100-192.168.1.200:customer=acmecorp:environment=production
 ```
 
 This makes promacct sniff for traffic on eth0 and eth1, storing the
 total amount of traffic in separate histograms. It also creates
 histograms for the aggregated amount of network traffic for every
-individual IPv4 address between 192.168.1.100 and 192.168.1.200.
+individual IPv4 address between 192.168.1.100 and 192.168.1.200. To each
+of these entries, it also attaches the labels `customer` and
+`environment`, having the values `acmecorp` and `production`,
+respectively.
 
 # Useful Prometheus rules
 

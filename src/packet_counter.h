@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Kumina, https://kumina.nl/
+// Copyright (c) 2016-2017 Kumina, https://kumina.nl/
 //
 // This file is distributed under a 2-clause BSD license.
 // See the LICENSE file for details.
@@ -31,7 +31,7 @@ class PacketCounter : public ParsedPacketProcessor {
   void ProcessUnknownPacket(std::size_t original_length) override;
 
   // Prints all of the stored histograms to the metrics page output.
-  void PrintMetrics(const MetricsLabels* labels, MetricsPage* output);
+  void PrintMetrics(const MetricsLabels& labels, MetricsPage* output);
 
  private:
   typedef Histogram<64, 128, 256, 512, 1024, 2048> PacketSizeHistogram;

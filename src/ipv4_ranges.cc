@@ -6,15 +6,13 @@
 #include <cassert>
 #include <cstdint>
 #include <optional>
-#include <string>
-#include <string_view>
 
 #include "ipv4_ranges.h"
 
-void IPv4Ranges::AddRange(std::string_view description, std::uint32_t first,
+void IPv4Ranges::AddRange(const MetricsLabels* labels, std::uint32_t first,
                           std::uint32_t last) {
   assert(first <= last && "Not a valid IPv4 range.");
-  ranges_.push_back({std::string(description), first, last});
+  ranges_.push_back({labels, first, last});
 }
 
 std::size_t IPv4Ranges::GetLength() const {
@@ -35,11 +33,11 @@ std::optional<std::size_t> IPv4Ranges::GetIndexByAddress(
   return {};
 }
 
-std::pair<std::string_view, std::uint32_t> IPv4Ranges::GetAddressByIndex(
+std::pair<const MetricsLabels*, std::uint32_t> IPv4Ranges::GetAddressByIndex(
     std::size_t idx) const {
   for (const auto& range : ranges_) {
     if (idx <= range.last - range.first)
-      return {range.description, range.first + idx};
+      return {range.labels, range.first + idx};
     idx -= range.last - range.first + 1;
   }
   assert(0 && "GetAddressByIndex() out of bounds");

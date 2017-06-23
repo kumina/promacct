@@ -8,8 +8,10 @@
 #include <unistd.h>
 
 #include <algorithm>
+#include <cassert>
 #include <chrono>
 #include <cstdlib>
+#include <forward_list>
 #include <iostream>
 #include <ostream>
 #include <string>
@@ -35,8 +37,8 @@ class PacketCounterServer : public WebserverRequestHandler {
   void HandleRequest(std::ostream* output) override {
     MetricsPage page("promacct_", output);
     for (size_t i = 0; i < interfaces_->size(); ++i) {
-      MetricsLabels interface(nullptr, "interface", (*interfaces_)[i]);
-      (*packet_counters_)[i].PrintMetrics(&interface, &page);
+      MetricsLabel interface("interface", (*interfaces_)[i]);
+      (*packet_counters_)[i].PrintMetrics(interface, &page);
     }
   }
 
@@ -47,7 +49,7 @@ class PacketCounterServer : public WebserverRequestHandler {
 
 void usage() {
   std::cerr << "usage: promacct -i interface ... [-p httpport] "
-               "[-r description:startaddr-endaddr ...]"
+               "[-r startaddr-endaddr[:key=value...] ...]"
             << std::endl;
   std::exit(1);
 }
@@ -66,6 +68,9 @@ int main(int argc, char* argv[]) {
   std::vector<std::string> interfaces;
   std::uint16_t httpport = 9112;
   IPv4Ranges ranges;
+  MetricsLabelsTerminator no_labels;
+  std::forward_list<MetricsLabel> labels;
+  std::forward_list<MetricsLabelsJoiner> joiners;
   while ((ch = getopt(argc, argv, "i:p:r:")) != -1) {
     switch (ch) {
       case 'i':
@@ -77,17 +82,31 @@ int main(int argc, char* argv[]) {
         httpport = std::stoi(optarg);
         break;
       case 'r': {
-        // IP range: description:startaddr-endaddr.
+        // IP range: startaddr-endaddr[:key=value...].
+        // Extract start address and end address.
         std::string_view arg(optarg);
-        auto split1 = std::find(arg.begin(), arg.end(), ':');
-        if (split1 == arg.end())
+        auto endaddr = std::find(arg.begin(), arg.end(), '-');
+        if (endaddr == arg.end())
           usage();
-        auto split2 = std::find(split1, arg.end(), '-');
-        if (split2 == arg.end())
-          usage();
-        ranges.AddRange(std::string_view(arg.begin(), split1 - arg.begin()),
-                        parse_ipv4_address(std::string(split1 + 1, split2)),
-                        parse_ipv4_address(std::string(split2 + 1, arg.end())));
+        auto kvs = std::find(endaddr, arg.end(), ':');
+
+        // Extract labels.
+        const MetricsLabels* range_labels = &no_labels;
+        for (auto key = kvs; key != arg.end();) {
+          auto value = std::find(key, arg.end(), '=');
+          if (value == arg.end())
+            usage();
+          auto next = std::find(value, arg.end(), ':');
+          // TODO(ed): Use C++17 emplace_front().
+          labels.emplace_front(std::string_view(key + 1, value - (key + 1)),
+                               std::string_view(value + 1, next - (value + 1)));
+          joiners.emplace_front(range_labels, &labels.front());
+          range_labels = &joiners.front();
+          key = next;
+        }
+        ranges.AddRange(range_labels,
+                        parse_ipv4_address(std::string(arg.begin(), endaddr)),
+                        parse_ipv4_address(std::string(endaddr + 1, kvs)));
         break;
       }
       default:

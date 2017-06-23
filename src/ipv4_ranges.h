@@ -8,9 +8,9 @@
 
 #include <cstdint>
 #include <optional>
-#include <string>
-#include <string_view>
 #include <vector>
+
+class MetricsLabels;
 
 // Set of IPv4 address ranges.
 //
@@ -20,7 +20,7 @@
 class IPv4Ranges {
  public:
   // Adds a new IPv4 address range to the store.
-  void AddRange(std::string_view description, std::uint32_t first,
+  void AddRange(const MetricsLabels* labels, std::uint32_t first,
                 std::uint32_t last);
 
   // Returns the total number of IPv4 addresses stored within.
@@ -33,12 +33,12 @@ class IPv4Ranges {
   // Given a unique identifier, return the IPv4 address. This is used by
   // ParsedPacketCounter to reobtain the IPv4 address associated with a
   // histogram, used for printing metrics.
-  std::pair<std::string_view, std::uint32_t> GetAddressByIndex(
+  std::pair<const MetricsLabels*, std::uint32_t> GetAddressByIndex(
       std::size_t) const;
 
  private:
   struct IPv4Range {
-    std::string description;
+    const MetricsLabels* labels;
     std::uint32_t first;
     std::uint32_t last;
   };

@@ -9,45 +9,66 @@
 #include <ostream>
 #include <string_view>
 
-// Utility class for attaching labels to metrics.
+// Rope/cord-like class for holding a set of metrics labels.
 //
-// This program models labels as being stored in a linked list,
-// terminated with 'nullptr'. This approach allows us to efficiently
-// propagate labels down to other functions on the call stack.
-//
-// For example, two labels on a metric can be configured as follows:
-//
-//     MetricsLabel l1(null, "key1", "value1");
-//     MetricsLabel l2(&l1, "key1", "value1");
-//     MetricsPage *p = ...;
-//     p->PrintMetric("name", &l2, 123);
-//
-// This will result in 'name{key1="value1",key2="value"} 123' being
-// emitted onto the metrics page. This class does not own the strings
-// passed to the constructor.
+// These classes can be used to temporarily construct metrics labels on
+// the stack, so that they can be printed by class MetricsPage. To
+// prevent any heap allocations, these classes use a tree-like
+// structure, so labels from multiple sources can be combined.
 class MetricsLabels {
  public:
-  MetricsLabels(const MetricsLabels* inherit, std::string_view key,
-                std::string_view value)
-      : inherit_(inherit), key_(key), value_(value) {
+  MetricsLabels() {
+  }
+  virtual ~MetricsLabels() {
   }
 
-  // Prints the set of labels of a metric to the output stream.
-  void Print(std::ostream* output) const {
-    const MetricsLabels* label = this;
-    for (;;) {
-      *output << label->key_ << "=\"" << label->value_ << '"';
-      if (label->inherit_ == nullptr)
-        break;
-      label = label->inherit_;
+  virtual void Print(std::ostream* output, bool* needs_comma) const = 0;
+
+  MetricsLabels& operator=(const MetricsLabels&) = delete;
+  MetricsLabels(const MetricsLabels&) = delete;
+};
+
+// Singleton key-value pair, representing a single label.
+class MetricsLabel : public MetricsLabels {
+ public:
+  MetricsLabel(std::string_view key, std::string_view value)
+      : key_(key), value_(value) {
+  }
+
+  void Print(std::ostream* output, bool* needs_comma) const override {
+    if (*needs_comma)
       *output << ',';
-    }
+    *needs_comma = true;
+    *output << key_ << "=\"" << value_ << '"';
   }
 
  private:
-  const MetricsLabels* const inherit_;  // Next labels.
-  std::string_view const key_;          // Key of this label.
-  std::string_view const value_;        // Value of this label.
+  std::string_view key_;
+  std::string_view value_;
+};
+
+// The empty set: no labels.
+class MetricsLabelsTerminator : public MetricsLabels {
+ public:
+  void Print(std::ostream* output, bool* needs_comma) const override {
+  }
+};
+
+// Union of two sets of labels.
+class MetricsLabelsJoiner : public MetricsLabels {
+ public:
+  MetricsLabelsJoiner(const MetricsLabels* left, const MetricsLabels* right)
+      : left_(left), right_(right) {
+  }
+
+  void Print(std::ostream* output, bool* needs_comma) const override {
+    left_->Print(output, needs_comma);
+    right_->Print(output, needs_comma);
+  }
+
+ private:
+  const MetricsLabels* const left_;
+  const MetricsLabels* const right_;
 };
 
 #endif

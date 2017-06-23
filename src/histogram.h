@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Kumina, https://kumina.nl/
+// Copyright (c) 2016-2017 Kumina, https://kumina.nl/
 //
 // This file is distributed under a 2-clause BSD license.
 // See the LICENSE file for details.
@@ -43,7 +43,7 @@ class Histogram {
   }
 
   // Prints all values stored in the histogram object.
-  void PrintMetrics(const std::string& name, const MetricsLabels* labels,
+  void PrintMetrics(const std::string& name, const MetricsLabels& labels,
                     MetricsPage* output) const {
     if (count_ > 0) {
       // Print scalar values.
@@ -54,11 +54,13 @@ class Histogram {
       const unsigned int boundaries[] = {Buckets...};
       for (unsigned int i = 0; i < sizeof...(Buckets); ++i) {
         std::string boundary = std::to_string(boundaries[i]);
-        MetricsLabels le(labels, "le", boundary);
-        output->PrintMetric(name + "_bucket", &le, buckets_[i]);
+        MetricsLabel le("le", boundary);
+        MetricsLabelsJoiner joiner(&labels, &le);
+        output->PrintMetric(name + "_bucket", joiner, buckets_[i]);
       }
-      MetricsLabels le(labels, "le", "+Inf");
-      output->PrintMetric(name + "_bucket", &le, count_);
+      MetricsLabel le("le", "+Inf");
+      MetricsLabelsJoiner joiner(&labels, &le);
+      output->PrintMetric(name + "_bucket", joiner, count_);
     }
   }
 
