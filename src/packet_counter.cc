@@ -63,7 +63,7 @@ void PacketCounter::PrintMetrics(const MetricsLabels& labels,
             << (addr.second >> 8 & 0xff) << '.' << (addr.second & 0xff);
     std::string addr_str = addr_ss.str();
     MetricsLabel ip("ip", addr_str);
-    MetricsLabelsJoiner joiner2(&joiner1, &labels);
+    MetricsLabelsJoiner joiner2(&joiner1, &ip);
 
     // Print aggregated TX/RX statistics.
     packet_size_bytes_ipv4_tx_[i].PrintMetrics("packet_size_bytes_ipv4_tx",
